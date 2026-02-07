@@ -1,138 +1,124 @@
 import streamlit as st
-import pandas as pd
-import numpy as np
 import time
-
-# --- CUSTOM MODULES (Your Teammates' Code) ---
-import ai_engine       # The Brain (Member 2)
-import data_generator  # The Data Source (Member 1)
+import ai_engine       # Your Brain
+import data_generator  # Your Data Source
 
 # --- 1. CONFIGURATION & THEME ---
 st.set_page_config(
-    page_title="OmniSight AI | Enterprise Intelligence",
-    page_icon="🌐",
+    page_title="OmniSight AI | Enterprise Nervous System",
+    page_icon="👁️",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Custom Styling (Cyberpunk/Enterprise Look)
+# Custom Styling to make it look like a pro dashboard
 st.markdown("""
     <style>
-    .stApp { background-color: #f8f9fa; color: #1a1a1a; }
-    div[data-testid="stSidebar"] { background-color: #2e1a47; }
-    div[data-testid="stSidebar"] * { color: white !important; }
-    .stMetricValue { color: #6f42c1 !important; font-weight: bold; }
-    .stAlert { background-color: #f3f0f7; border: 1px solid #dcd3e9; color: #2e1a47; }
+    .stApp { background-color: #0e1117; color: #ffffff; }
+    div[data-testid="stMetricValue"] { font-size: 24px; color: #00f2ea; }
+    .stButton>button { background-color: #00f2ea; color: #000000; border-radius: 8px; font-weight: bold;}
+    .reportview-container .main .block-container { max-width: 1200px; }
+    h1 { color: #00f2ea; }
+    h2, h3 { color: #ffffff; }
     </style>
     """, unsafe_allow_html=True)
 
-# --- 2. DATA LOADING FUNCTION ---
-def refresh_data():
-    """
-    Fetches fresh data from Member 1's generator and calculates key metrics.
-    """
-    # 1. Get raw data from the generator
-    raw_fin = data_generator.get_financial_data()
-    raw_ops = data_generator.get_operations_data()
-    raw_partners = data_generator.get_partner_data()
-    # (Optional) Handle clients if added to generator
-    try:
-        raw_clients = data_generator.get_client_data()
-    except AttributeError:
-        raw_clients = [] # Fallback if function missing
-
-    # 2. Structure it for the AI
-    full_state = {
-        "finance": raw_fin,
-        "operations": raw_ops,
-        "partners": raw_partners,
-        "clients": raw_clients
+# --- 2. DATA LOADING & STATE MANAGEMENT ---
+def load_data():
+    """Fetches fresh data from the generator."""
+    return {
+        "finance": data_generator.get_financial_data(),
+        "operations": data_generator.get_operations_data(),
+        "partners": data_generator.get_partner_data(),
+        "clients": data_generator.get_client_data()
     }
-    
-    # 3. Calculate Key Metrics for the UI
-    # Revenue = Sum of all 'Income' amounts
-    total_revenue = sum(item['amount'] for item in raw_fin if item['type'] == 'Income')
-    
-    # Active Operations = Count of operations with status 'Active'
-    active_ops = sum(1 for item in raw_ops if item['status'] == 'Active')
-    
-    # Partner Reliability = Count of 'High' reliability partners
-    reliable_partners = sum(1 for item in raw_partners if item.get('reliability') == 'High')
 
-    return full_state, total_revenue, active_ops, reliable_partners
-
-# --- 3. SESSION STATE INITIALIZATION ---
+# Initialize Session State (so data stays consistent until you refresh)
 if 'state_data' not in st.session_state:
-    # Load initial data
-    data, rev, ops, partners = refresh_data()
-    st.session_state.state_data = data
-    st.session_state.metric_revenue = rev
-    st.session_state.metric_ops = ops
-    st.session_state.metric_partners = partners
-    st.session_state.briefing = "🔵 **System Ready.** Click 'Run AI Analysis' to generate an intelligence report."
+    st.session_state.state_data = load_data()
+    st.session_state.ai_analysis = None # Store analysis so it doesn't disappear
 
-# --- 4. UI LAYOUT ---
+# --- 3. METRIC CALCULATIONS ---
+current_data = st.session_state.state_data
+
+# Calculate Revenue (Sum of all 'Income')
+total_revenue = sum(item['amount'] for item in current_data['finance'] if item['type'] == 'Income')
+# Calculate Active Operations
+active_ops = sum(1 for item in current_data['operations'] if item['status'] == 'Active')
+# Calculate Partner Reliability Count
+reliable_partners = sum(1 for item in current_data['partners'] if item['reliability'] == 'High')
+
+# --- 4. SIDEBAR (SIMULATION) ---
+with st.sidebar:
+    st.image("https://cdn-icons-png.flaticon.com/512/825/825590.png", width=80)
+    st.title("OmniSight Control")
+    st.markdown("---")
+    
+    st.markdown("### 🎮 Simulation Lab")
+    if st.button("🔄 Refresh Data Feed", use_container_width=True):
+        with st.spinner("Simulating new data stream..."):
+            time.sleep(1) # Fake loading for effect
+            st.session_state.state_data = load_data()
+            st.session_state.ai_analysis = None # Reset analysis on new data
+            st.rerun()
+            
+    st.info(f"System Status: **ONLINE**\n\nConnected to: **Gemini 1.5 Flash**")
+
+# --- 5. MAIN DASHBOARD UI ---
 
 # Header
-st.title("🌐 OmniSight AI")
-st.markdown("**Real-Time Enterprise Intelligence System**")
+st.title("👁️ OmniSight AI")
+st.markdown("#### The Enterprise Nervous System: Unifying Finance, Ops, and Partners.")
 st.divider()
 
-# Columns: Metrics | AI Analysis | Chat
-col1, col2, col3 = st.columns([1, 1.5, 1])
+# ROW 1: THE "GOD VIEW" (Scoreboard)
+col1, col2, col3, col4 = st.columns(4)
 
-# --- COLUMN 1: LIVE METRICS (From Data Generator) ---
 with col1:
-    st.subheader("📡 Live Status")
-    
-    with st.expander("💰 Financial Health", expanded=True):
-        st.metric("Total Revenue", f"${st.session_state.metric_revenue:,.0f}")
-        st.caption("Real-time aggregation from finance ledger.")
-
-    with st.expander("⚙️ Operations", expanded=True):
-        st.metric("Active Lines", st.session_state.metric_ops)
-        st.caption(f"Production lines currently running.")
-
-    with st.expander("🤝 Partner Network", expanded=True):
-        st.metric("High Reliability Partners", st.session_state.metric_partners)
-
-# --- COLUMN 2: AI BRAIN (From AI Engine) ---
+    st.metric("💰 Total Revenue", f"${total_revenue:,.0f}", delta="+12%")
 with col2:
-    st.subheader("🧠 Executive Briefing")
-    
-    # The "Run Analysis" Button
-    if st.button("⚡ Run AI Analysis", use_container_width=True):
-        with st.spinner("OmniSight is synthesizing data..."):
-            # CALLING YOUR AI ENGINE HERE
-            analysis_text = ai_engine.analyze_state(st.session_state.state_data)
-            st.session_state.briefing = analysis_text
-            
-    # Display the Analysis
-    st.info(st.session_state.briefing)
-    
-    # Visual Candy (Graph)
-    st.markdown("##### 📉 Risk Projection")
-    chart_data = pd.DataFrame(np.random.randn(20, 3), columns=['Revenue Risk', 'Ops Strain', 'Market Volatility'])
-    st.area_chart(chart_data, color=["#6f42c1", "#2e1a47", "#dcd3e9"])
-
-# --- COLUMN 3: CHAT (From AI Engine) ---
+    st.metric("⚙️ Active Production", f"{active_ops} Lines", delta="Stable")
 with col3:
-    st.subheader("💬 Strategy Chat")
-    
-    user_input = st.text_input("Ask OmniSight:", placeholder="e.g., Why is revenue down?")
-    
-    if user_input:
-        with st.spinner("Thinking..."):
-            # CALLING YOUR AI ENGINE HERE
-            response = ai_engine.ask_ai_question(user_input, st.session_state.state_data)
-            st.write(response)
+    st.metric("🤝 Reliable Partners", f"{reliable_partners} / {len(current_data['partners'])}", delta="-1")
+with col4:
+    st.metric("👥 Active Clients", f"{len(current_data['clients'])}", delta="No Change")
 
-# --- SIDEBAR: SIMULATION TOOLS ---
-with st.sidebar:
-    st.header("🎮 Simulation")
+# ROW 2: THE "WHY ENGINE" (AI Analysis)
+st.divider()
+st.subheader("🧠 Executive Intelligence Briefing")
+
+# The "Magic Button"
+if st.button("⚡ Analyze Cross-Domain Risks", use_container_width=True):
+    with st.spinner("OmniSight is connecting the dots across 4 domains..."):
+        # CALL YOUR BRAIN
+        analysis_text = ai_engine.analyze_state(current_data)
+        st.session_state.ai_analysis = analysis_text
+
+# Display the Analysis if it exists
+if st.session_state.ai_analysis:
+    st.success("Analysis Complete")
+    st.markdown(f"""
+    <div style="background-color: #1e2130; padding: 20px; border-radius: 10px; border-left: 5px solid #00f2ea;">
+        {st.session_state.ai_analysis}
+    </div>
+    """, unsafe_allow_html=True)
+else:
+    st.info("System Standby. Click 'Analyze' to detect hidden risks.")
+
+# ROW 3: THE "SMART CONSULTANT" (Chat)
+st.divider()
+col_chat_input, col_chat_output = st.columns([1, 2])
+
+with col_chat_input:
+    st.subheader("💬 Ask the Data")
+    user_q = st.text_input("Query the system:", placeholder="e.g. Which partner is causing the risk?")
     
-    if st.button("🔄 Refresh Data Feed"):
-        # This simulates "Time Passing" by fetching new data
-        data, rev, ops, partners = refresh_data()
-        st.session_state.state_data = data
-        st.session_state.metric_revenue = rev
+    if user_q:
+        with st.spinner("Thinking..."):
+            # CALL YOUR BRAIN (Chat function)
+            answer = ai_engine.ask_ai_question(user_q, current_data)
+            
+            # Show result in the right column
+            with col_chat_output:
+                st.subheader("💡 OmniSight Answer")
+                st.write(answer)

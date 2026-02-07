@@ -17,16 +17,24 @@ def analyze_state(state_data):
     Analyzes the full business state and returns a strategic executive summary.
     """
     system_prompt = """
-    You are the 'Real-Time Enterprise Intelligence Agent'.
-    Analyze the provided data.
-    1. Detect anomalies (price drops, churn spikes).
-    2. Explain the CAUSE (e.g. "Revenue is down BECAUSE competitor X dropped prices").
-    3. Recommend 2 specific actions.
+    You are a senior strategic advisor.
+    Synthesize the provided data (Finance, Operations, Partners) into a brief, high-impact memo.
+
+    ### GUIDELINES:
+    1. No fluff, no pleasantries, no robotic transitions.
+    2. Focus strictly on cross-domain causality (e.g., how Partner issues are causing Financial variance).
+    3. Use a direct, professional tone.
+
+    ### FORMAT:
     
-    Format:
-    ### 🚨 ALERT: [Headline]
-    **Analysis:** [Your logic]
-    **Action:** [What to do]
+    EXECUTIVE BRIEFING: [High-Impact 5-Word Headline]
+
+    CRITICAL INSIGHT:
+    [1-2 sentences explaining the root cause connection. Example: Revenue is underperforming targets because Supplier X has failed to deliver, creating a bottleneck in Operations.]
+
+    RECOMMENDATIONS:
+    * Immediate: [Specific tactical step] (Est. Impact: [Value])
+    * Strategic: [Long-term correction] (Est. Impact: [Value])
     """
     
     user_message = f"{system_prompt}\n\nCurrent Data: {json.dumps(state_data)}"
