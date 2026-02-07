@@ -4,7 +4,9 @@ def show(current_data, ai_engine):
     """Displays the Domain Deep Dive view."""
     st.markdown("## 📊 Domain Specific Intelligence")
     st.markdown("Inspect raw data streams and perform isolated domain analysis.")
-    
+    st.markdown("<div class='os-card' style='margin-bottom:14px;'><b>Page</b> <span class='small-muted'>• your existing content below</span></div>", unsafe_allow_html=True)
+
+
     # Domain Selector
     domain = st.selectbox("Select Domain Layer", list(current_data.keys()))
     

@@ -4,7 +4,8 @@ def show(current_data, ai_engine):
     """Displays the Scenario Modeling view."""
     st.markdown("## 🎭 Wargaming & Simulations")
     st.markdown("Select a predefined scenario to simulate cross-domain impact.")
-    
+    st.markdown("<div class='os-card' style='margin-bottom:14px;'><b>Page</b> <span class='small-muted'>• your existing content below</span></div>", unsafe_allow_html=True)
+
     c1, c2, c3 = st.columns(3)
     
     # Scenario Buttons

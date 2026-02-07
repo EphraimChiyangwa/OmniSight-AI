@@ -103,3 +103,20 @@ def get_compliance_data():
         {"domain": "Partner Management", "risk_level": "Medium", "compliance_score": 0.82, "issues": 1, "notes": "Partner concentration risk"},
         {"domain": "Client Data", "risk_level": "Low", "compliance_score": 0.93, "issues": 0}
     ]
+def generate_full_dataset():
+    """
+    Returns the full OmniSight dataset in a single dict.
+    This is the contract the UI + AI engine expects.
+    """
+    return {
+        "finance": get_financial_data(),
+        "operations": get_operations_data(),
+        "partners": get_partner_data(),
+        "clients": get_client_data(),
+        "competitive": get_competitive_data(),
+        "compliance": get_compliance_data(),
+        "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+    }
+
+# Optional: keep a shorter alias so it's easy to call
+generate_data = generate_full_dataset
