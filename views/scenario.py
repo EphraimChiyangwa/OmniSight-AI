@@ -8,7 +8,6 @@ def show(current_data, ai_engine):
 
     c1, c2, c3 = st.columns(3)
     
-    # Scenario Buttons
     if c1.button("📉 Competitor Price Drop", use_container_width=True):
         with st.spinner("Simulating..."):
             st.session_state.scenario_result = ai_engine.simulate_scenario("Competitor drops price by 15%", current_data)
@@ -23,8 +22,7 @@ def show(current_data, ai_engine):
             
     st.markdown("---")
     st.markdown("### Simulation Results")
-    
-    # Display results if available
+
     if st.session_state.scenario_result:
         st.markdown(f'<div class="analysis-container">{st.session_state.scenario_result}</div>', unsafe_allow_html=True)
     else:

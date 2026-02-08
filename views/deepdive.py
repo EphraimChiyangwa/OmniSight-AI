@@ -6,19 +6,14 @@ def show(current_data, ai_engine):
     st.markdown("Inspect raw data streams and perform isolated domain analysis.")
     st.markdown("<div class='os-card' style='margin-bottom:14px;'><b>Page</b> <span class='small-muted'>• your existing content below</span></div>", unsafe_allow_html=True)
 
-
-    # Domain Selector
     domain = st.selectbox("Select Domain Layer", list(current_data.keys()))
     
     col_l, col_r = st.columns([1, 1])
-    
-    # Left Column: Raw Data Viewer
+
     with col_l:
         st.markdown(f"### Raw Data Stream: {domain.title()}")
-        # Showing only first 3 items for cleanliness in demo
         st.json(current_data[domain][:3]) 
-    
-    # Right Column: Specific AI Analysis
+
     with col_r:
         st.markdown(f"### AI Layer Analysis: {domain.title()}")
         if st.button(f"Analyze {domain} Only", use_container_width=True):

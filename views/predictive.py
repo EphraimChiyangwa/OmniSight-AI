@@ -11,7 +11,6 @@ def show(current_data, ai_engine):
         st.markdown("### Configuration")
         timeframe = st.selectbox("Time Horizon", ["7 Days", "30 Days", "Quarterly"])
         
-        # Button to trigger prediction
         if st.button("▶ Run Forecast", use_container_width=True):
             with st.spinner("Calculating probabilities..."):
                 st.session_state.prediction = ai_engine.predict_future_state(current_data, timeframe)

@@ -1,16 +1,8 @@
-"""
-Optimized AI Engine for OmniSight-AI
-Mode: DEMO-RESILIENT (Real AI + Mock AI fallback)
-"""
-
 import os
 import json
 import google.generativeai as genai
 from dotenv import load_dotenv
 
-# -------------------------------------------------
-# CONFIGURATION
-# -------------------------------------------------
 load_dotenv()
 api_key = os.getenv("GOOGLE_API_KEY")
 
@@ -39,17 +31,12 @@ if MOCK_AI_MODE:
 else:
     print(f"✅ OmniSight AI using model: {DEFAULT_MODEL}")
 
-# -------------------------------------------------
-# PERSONA
-# -------------------------------------------------
 BASE_PERSONA = """
-You are OmniSight AI, a real-time enterprise intelligence agent.
-Tone: Executive. Decisive. Insight-driven.
+You are OmniSight AI. 
+Tone: Executive, Direct, and Ultra-concise.
+Constraint: Use plain English. No corporate jargon. Max 3-4 bullet points.
 """.strip()
 
-# -------------------------------------------------
-# MOCK RESPONSE (USED IF API FAILS)
-# -------------------------------------------------
 def _mock_executive_response():
     return """
 ### 🚨 EXECUTIVE ALERT
@@ -71,9 +58,6 @@ Overall: Medium
 Reason: Competitive data is strong; client elasticity requires further validation
 """
 
-# -------------------------------------------------
-# CORE ANALYSIS
-# -------------------------------------------------
 def analyze_state(state_data):
     if MOCK_AI_MODE:
         return _mock_executive_response()
@@ -97,15 +81,13 @@ TASK:
     except Exception as e:
         return _mock_executive_response()
 
-# -------------------------------------------------
-# Q&A
-# -------------------------------------------------
 def ask_ai_question(question, state_data):
     if MOCK_AI_MODE:
         return (
-            "**Answer:** Revenue is declining due to competitive pricing pressure.\n\n"
-            "**Evidence:** Churn increased following a competitor price drop.\n\n"
-            "**Action:** Adjust pricing or partner incentives immediately."
+            "**Main Reason:** Competitive pricing combined with supplier quality issues.\n\n"
+            "* **Supplier Issue:** P002 quality dropped by 12%.\n"
+            "* **Market Pressure:** Competitor A cut prices by 15%.\n"
+            "* **High Risk:** Major client C003 is likely to churn."
         )
 
     try:
@@ -113,16 +95,23 @@ def ask_ai_question(question, state_data):
             model_name=DEFAULT_MODEL,
             system_instruction=BASE_PERSONA,
         )
-        response = model.generate_content(
-            f"QUESTION:\n{question}\nDATA:\n{json.dumps(state_data, ensure_ascii=False)}"
-        )
+        
+        simplified_prompt = f"""
+        Answer this question using the data provided: "{question}"
+        
+        Rules:
+        1. Start with a single sentence "Root Cause".
+        2. Provide max 3 "Key Evidences" as bullet points.
+        3. Use simple words. Avoid technical metrics unless essential.
+        
+        DATA:
+        {json.dumps(state_data, ensure_ascii=False)}
+        """
+        
+        response = model.generate_content(simplified_prompt)
         return response.text
     except Exception:
-        return "⚠️ AI unavailable."
-
-# -------------------------------------------------
-# OPTIONAL STUBS (SAFE FOR DEMO)
-# -------------------------------------------------
+        return "⚠️ AI service unavailable."
 def predict_future_state(state_data, timeframe):
     return "Projected Revenue: -5% | Risk: Medium | Key Driver: Competitive pressure"
 

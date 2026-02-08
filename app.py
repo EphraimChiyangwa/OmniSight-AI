@@ -4,12 +4,9 @@ import re
 
 import ai_engine
 import data_generator
+
 from views import dashboard, deepdive, predictive, scenario
 
-
-# ============================================================
-# SVG ICON SYSTEM (NO EMOJI)
-# ============================================================
 def icon_eye(size=18, color="currentColor"):
     return f"""
 <svg xmlns="http://www.w3.org/2000/svg" width="{size}" height="{size}"
@@ -20,10 +17,6 @@ stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 </svg>
 """
 
-
-# ============================================================
-# PAGE CONFIG
-# ============================================================
 st.set_page_config(
     page_title="OmniSight AI",
     page_icon="O",
@@ -31,10 +24,6 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-
-# ============================================================
-# GLOBAL STYLING (FIXED + CLEAN)
-# ============================================================
 st.markdown(
     """
 <style>
@@ -85,7 +74,7 @@ header {visibility: hidden;}
   margin-top: 2px;
 }
 
-/* Cards / Boxes (FIXED BRACE) */
+/* Cards / Boxes */
 .os-card{
   background: rgba(17,24,39,0.70);
   border: 1px solid rgba(255,255,255,0.08);
@@ -171,10 +160,6 @@ div.stButton > button:hover {
     unsafe_allow_html=True,
 )
 
-
-# ============================================================
-# SESSION STATE
-# ============================================================
 def ss_default(key, value):
     if key not in st.session_state:
         st.session_state[key] = value
@@ -186,10 +171,6 @@ ss_default("prediction", "")
 ss_default("scenario_result", "")
 ss_default("deepdive_result", "")
 
-
-# ============================================================
-# TOP BAR
-# ============================================================
 topbar_html = f"""
 <div class="os-topbar">
   <div style="display:flex; gap:12px; align-items:center;">
@@ -207,11 +188,7 @@ safe_topbar = textwrap.dedent(topbar_html).strip()
 safe_topbar = re.sub(r"(?m)^[ \t]{4,}", "", safe_topbar)
 st.markdown(safe_topbar, unsafe_allow_html=True)
 
-
-# ============================================================
-# NAVIGATION (UNCHANGED)
-# ============================================================
-tabs = st.tabs(["Dashboard", "Deep Dive", "Prediction", "Scenarios"])
+tabs = st.tabs(["Executive Overview", "Business Signals", "Risk & Forecast", "What-If Scenarios"])
 
 with tabs[0]:
     dashboard.show(st.session_state.current_data, ai_engine)

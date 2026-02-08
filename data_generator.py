@@ -1,7 +1,3 @@
-"""
-Enhanced Data Generator for OmniSight-AI
-Now with 6 domains, realistic patterns, and demo scenarios built-in
-"""
 
 import random
 from datetime import datetime, timedelta
@@ -118,5 +114,4 @@ def generate_full_dataset():
         "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
     }
 
-# Optional: keep a shorter alias so it's easy to call
 generate_data = generate_full_dataset
